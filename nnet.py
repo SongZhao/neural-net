@@ -13,11 +13,11 @@ def takeInput(inFile):
     for m in range(num_sample):
         featureVector = []
         for n in range(num_feat):
-            this_feature_info = metadata[metadata.names()[n]]
+            this_feature_info = metadata[metadata.names()[n]] 
             if this_feature_info[0] == 'numeric':
                 featureVector.append(data[m][n])
             else:
-                featureVector.append(metadata[metadata.names()[n]][1].index(data[m][n]))
+                featureVector.append(metadata[metadata.names()[n]][1].index(data[m][n])) #one-hot encoding
         feature.append(featureVector)
         Y.append(feature_info[1].index(data[m][num_feat]))
     return feature, Y, metadata, num_feat, num_sample
@@ -40,19 +40,20 @@ def Normalize(data, metadata, num_features, num_instances):
 
 def initWeights(h, row):
     weight = []     
-    weight.append(np.random.uniform(-0.01, 0.01, (h, row)))
-    h = h + 1
-    weight.append(np.random.uniform(-0.01, 0.01, h))  #+1for bias
+    weight.append(np.random.uniform(-0.01, 0.01, (h, row))) #generate random weights
+    h = h + 1 #+1for bias
+    weight.append(np.random.uniform(-0.01, 0.01, h))  
     return weight
 
-
+#sigma function
 def sig(input):
     return np.divide(1,(np.add(1,np.exp(-input))), dtype = np.float64)
 
+#cross-error
 def Error(y, y_hat):
     return -y * np.log(y_hat) - (1-y) * np.log(1-y_hat)
 
-
+#calculate gradient
 def gradient(feature, Y, O, weight, grad_1, grad_2, hiddenLayer):
     delta_o = Y - O
     delta_h = delta_o * weight * hiddenLayer * (1 - hiddenLayer)
@@ -137,12 +138,12 @@ fname_test = str(sys.argv[5])
 train, train_res, metadata,num_feat, num_sample = takeInput(fname_train)
 train = Normalize(train, metadata, num_feat, num_sample)
 m,n = np.shape(train)
-bias = np.ones((m,1))
+bias = np.ones((m,1))#add bias
 train = np.hstack((bias,train))
 test, true_Y, metadata, num_feat, num_sample= takeInput(fname_test)
 test = Normalize(test, metadata, num_feat, num_sample)
 m,n = np.shape(test)
-bias = np.ones((m,1))
+bias = np.ones((m,1))#add bias
 test = np.hstack((bias,test))
 weight = trainning(train, train_res, h, l, e)
 classify(test, true_Y, weight)
